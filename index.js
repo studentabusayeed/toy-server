@@ -28,8 +28,8 @@ async function run() {
     const toyCollection = client.db('carToy').collection('toys');
 
     // Creating index on two fields
-    const indexKeys = { title: 1, category: 1 }; // Replace field1 and field2 with your actual field names
-    const indexOptions = { name: "titleCategory" }; // Replace index_name with the desired index name
+    const indexKeys = { title: 1, category: 1 };
+    const indexOptions = { name: "titleCategory" };
     const result = await toyCollection.createIndex(indexKeys, indexOptions);
 
     app.get("/getByText/:text", async (req, res) => {

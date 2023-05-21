@@ -63,7 +63,6 @@ async function run() {
     });
 
     app.get('/myToys', async (req, res) => {
-      console.log(req.query.email);
       let query = {};
       if (req.query?.email) {
         query = { email: req.query.email };
@@ -73,7 +72,6 @@ async function run() {
     });
 
     app.get("/allCategory/:text", async (req, res) => {
-      console.log(req.params.text);
       if (req.params.text == "car" || req.params.text == "truck" || req.params.text == "police") {
         const toys = await toyCollection.find({
           category: req.params.text,
@@ -87,7 +85,6 @@ async function run() {
     app.post('/toys', async (req, res) => {
       const toy = req.body;
       toy.createdAt = new Date();
-      console.log(toy);
       const result = await toyCollection.insertOne(toy);
       res.send(result);
     });
@@ -95,7 +92,6 @@ async function run() {
     app.put("/toys/:id", async (req, res) => {
       const id = req.params.id;
       const body = req.body;
-      console.log(body);
       const filter = { _id: new ObjectId(id) };
       const options = { upsert: true };
       const updateDoc = {

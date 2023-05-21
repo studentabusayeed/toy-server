@@ -24,11 +24,28 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    client.connect();
     const toyCollection = client.db('carToy').collection('toys');
 
+    // Creating index on two fields
+    const indexKeys = { title: 1, category: 1 }; // Replace field1 and field2 with your actual field names
+    const indexOptions = { name: "titleCategory" }; // Replace index_name with the desired index name
+    const result = await toyCollection.createIndex(indexKeys, indexOptions);
+
+    app.get("/getByText/:text", async (req, res) => {
+      const text = req.params.text;
+      const result = await toyCollection.find({
+          $or: [
+            { name: { $regex: text, $options: "i" } },
+            { category: { $regex: text, $options: "i" } },
+          ],
+        })
+        .toArray();
+      res.send(result);
+    });
+
     app.get('/toys', async (req, res) => {
-      const cursor = toyCollection.find();
+      const cursor = toyCollection.find().sort({ createdAt: -1 });
       const result = await cursor.toArray();
       res.send(result);
     });
@@ -51,7 +68,7 @@ async function run() {
       if (req.query?.email) {
         query = { email: req.query.email };
       }
-      const result = await toyCollection.find(query).toArray();
+      const result = await toyCollection.find(query).sort({ createdAt: -1 }).toArray();
       res.send(result);
     });
 
@@ -63,12 +80,13 @@ async function run() {
         }).toArray();
         return res.send(toys);
       }
-        const toys = await toyCollection.find().toArray();
-        res.send(toys);
+      const toys = await toyCollection.find().toArray();
+      res.send(toys);
     });
 
     app.post('/toys', async (req, res) => {
       const toy = req.body;
+      toy.createdAt = new Date();
       console.log(toy);
       const result = await toyCollection.insertOne(toy);
       res.send(result);

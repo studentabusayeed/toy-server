@@ -35,11 +35,11 @@ async function run() {
     app.get("/getByText/:text", async (req, res) => {
       const text = req.params.text;
       const result = await toyCollection.find({
-          $or: [
-            { name: { $regex: text, $options: "i" } },
-            { category: { $regex: text, $options: "i" } },
-          ],
-        })
+        $or: [
+          { name: { $regex: text, $options: "i" } },
+          { category: { $regex: text, $options: "i" } },
+        ],
+      })
         .toArray();
       res.send(result);
     });
@@ -63,11 +63,20 @@ async function run() {
     });
 
     app.get('/myToys', async (req, res) => {
+      const sort = req.query.sort;
       let query = {};
       if (req.query?.email) {
         query = { email: req.query.email };
       }
-      const result = await toyCollection.find(query).sort({ createdAt: -1 }).toArray();
+
+      const options = {
+        // sort matched documents in descending order by rating
+        sort: {
+          "price": sort === 'asc' ? 1 : -1
+        }
+
+      };
+      const result = await toyCollection.find(query, options).toArray();
       res.send(result);
     });
 

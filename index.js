@@ -92,6 +92,22 @@ async function run() {
       res.send(result);
     });
 
+    app.put("/toys/:id", async (req, res) => {
+      const id = req.params.id;
+      const body = req.body;
+      console.log(body);
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          price: body.price,
+          quantity: body.quantity,
+          description: body.description,
+        },
+      };
+      const result = await toyCollection.updateOne(filter, updateDoc, options);
+      res.send(result);
+    });
 
     app.delete('/toys/:id', async (req, res) => {
       const id = req.params.id;
@@ -100,21 +116,6 @@ async function run() {
       res.send(result);
     });
 
-    app.put("/toys/:id", async (req, res) => {
-      const id = req.params.id;
-      const body = req.body;
-      console.log(body);
-      const filter = { _id: new ObjectId(id) };
-      const updateDoc = {
-        $set: {
-          price: body.price,
-          quantity: body.quantity,
-          description: body.description,
-        },
-      };
-      const result = await toyCollection.updateOne(filter, updateDoc);
-      res.send(result);
-    });
 
 
     // Send a ping to confirm a successful connection
